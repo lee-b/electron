@@ -648,7 +648,6 @@ WebContents.prototype._init = function () {
       const options = result.browserWindowConstructorOptions;
       if (!event.defaultPrevented) {
         openGuestWindow({
-          event,
           embedder: event.sender,
           disposition,
           referrer,
@@ -720,7 +719,6 @@ WebContents.prototype._init = function () {
       }
 
       openGuestWindow({
-        event,
         embedder: event.sender,
         guest: webContents,
         overrideBrowserWindowOptions: overriddenOptions,

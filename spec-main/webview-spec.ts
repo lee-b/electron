@@ -32,9 +32,12 @@ describe('<webview> tag', function () {
   afterEach(closeAllWindows);
 
   function hideChildWindows (e: any, wc: WebContents) {
-    wc.on('new-window', (event, url, frameName, disposition, options) => {
-      options.show = false;
-    });
+    wc.setWindowOpenHandler(() => ({
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        show: false
+      }
+    }));
   }
 
   before(() => {
@@ -625,31 +628,6 @@ describe('<webview> tag', function () {
           'Blocked a frame with origin "file://" from accessing a cross-origin frame.';
 
       expect(content).to.equal(expectedContent);
-    });
-
-    it('emits a new-window event', async () => {
-      // Don't wait for loading to finish.
-      const attributes = {
-        allowpopups: 'on',
-        nodeintegration: 'on',
-        webpreferences: 'contextIsolation=no',
-        src: `file://${fixtures}/pages/window-open.html`
-      };
-      const { url, frameName } = await w.webContents.executeJavaScript(`
-        new Promise((resolve, reject) => {
-          const webview = document.createElement('webview')
-          for (const [k, v] of Object.entries(${JSON.stringify(attributes)})) {
-            webview.setAttribute(k, v)
-          }
-          document.body.appendChild(webview)
-          webview.addEventListener('new-window', (e) => {
-            resolve({url: e.url, frameName: e.frameName})
-          })
-        })
-      `);
-
-      expect(url).to.equal('http://host/');
-      expect(frameName).to.equal('host');
     });
 
     it('emits a browser-window-created event', async () => {
